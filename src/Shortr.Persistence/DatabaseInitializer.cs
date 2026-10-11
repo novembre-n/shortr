@@ -2,9 +2,10 @@ using Microsoft.Data.Sqlite;
 
 namespace Shortr.Persistence;
 
-// Idempotent: schema.sql uses IF NOT EXISTS, so this runs on every startup.
-// The schema is embedded in the assembly so this works regardless of the
-// current working directory (dotnet run, published output, tests).
+// This method is idempotent. The file schema.sql uses IF NOT EXISTS.
+// The method runs safely on every startup. The schema is embedded in the
+// assembly. The method works in this way with any current directory:
+// under dotnet run, in published output, and in tests.
 public sealed class DatabaseInitializer
 {
     private const string SchemaResourceName = "Shortr.Persistence.schema.sql";

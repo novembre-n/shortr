@@ -3,7 +3,8 @@ using Microsoft.Extensions.Configuration;
 
 namespace Shortr.Persistence;
 
-// Caller opens and disposes the connection. Opening a SQLite connection is cheap (it's just a file).
+// The caller opens the connection. The caller disposes the connection.
+// A SQLite connection is a handle to a file. The open operation is cheap.
 public sealed class SqliteConnectionFactory
 {
     private readonly string _connectionString;

@@ -10,14 +10,14 @@ public sealed class SqliteConnectionFactoryTests : IDisposable
     [Fact]
     public void Create_FromConfiguredConnectionString_ReturnsOpenableConnection()
     {
-        // Arrange — a factory wired to this test's temp database
+        // Arrange: build a factory that points to the temp database of this test.
         var factory = _database.CreateFactory();
 
-        // Act — the one behavior under test: hand out an openable connection
+        // Act: get a connection. Open the connection.
         using var connection = factory.Create();
         connection.Open();
 
-        // Assert
+        // Assert: the state of the connection is Open.
         Assert.Equal(ConnectionState.Open, connection.State);
     }
 

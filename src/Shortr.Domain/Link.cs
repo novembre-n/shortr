@@ -6,6 +6,7 @@ public class Link
     public required string Code { get; set; }
     public required string OriginalUrl { get; set; }
 
-    // SQLite has no datetime type; stored as ISO-8601 text, which sorts correctly as strings.
+    // SQLite has no datetime type. The value is stored as ISO-8601 text.
+    // ISO-8601 text sorts in the correct order as a string.
     public DateTime CreatedAtUtc { get; set; }
 }

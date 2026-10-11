@@ -21,7 +21,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Schema must exist before the first request comes in.
+// The schema must exist before the first request.
 app.Services.GetRequiredService<DatabaseInitializer>().Initialize();
 
 app.Run();

@@ -3,10 +3,12 @@ using Shortr.Domain;
 
 namespace Shortr.UnitTests;
 
-// Hand-written fake, not a mocking library: the fake IS the test's stand-in
-// for the real (already integration-tested) repository. Queue<bool> lets a
-// test script the answers ("reject once, then accept") so the retry protocol
-// is tested deterministically despite the random generator.
+// This class is a hand-written fake. The class is not a mock from a library.
+// The class replaces the real repository in unit tests. The real repository
+// has integration tests. A queue of bool values lets a test script the
+// answers of the method AddAsync. Example: reject one request, then accept
+// the next request. This method makes the retry protocol testable without
+// control of the random generator.
 public sealed class FakeLinkRepository : ILinkRepository
 {
     public List<Link> Links { get; } = new();
@@ -21,8 +23,9 @@ public sealed class FakeLinkRepository : ILinkRepository
     {
         AddCalls++;
 
-        // Scripted answers replace only the collision decision — on true the
-        // link is still stored, exactly like the real repository's INSERT.
+        // Scripted answers replace only the collision decision. The value
+        // true stores the link. The real repository stores the link in the
+        // same way on a successful INSERT.
         var accepted = AddAsyncResultQueue.Count > 0
             ? AddAsyncResultQueue.Dequeue()
             : !AlwaysReject && Links.All(l => l.Code != link.Code);
@@ -80,7 +83,8 @@ public sealed class LinkServiceTests
     public async Task CreateAsync_Collision_RetriesWithNewCode()
     {
         var repository = new FakeLinkRepository();
-        // Script the repository's answers: reject once (collision), accept next.
+        // Script the answers of the repository: reject one request, then
+        // accept the next request.
         repository.AddAsyncResultQueue = new Queue<bool>(RejectedThenAccepted);
         var service = CreateService(repository);
 

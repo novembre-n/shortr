@@ -8,10 +8,10 @@ namespace Shortr.Persistence;
 
 public sealed class LinkRepository : ILinkRepository
 {
-    // Dapper's default DateTime parse loses the UTC flag (SQLite TEXT has no
-    // timezone marker). Mapping the date as string and parsing it ourselves
-    // keeps Kind=Utc through the round-trip — the write side stores "o" of a
-    // UTC value, so the text genuinely is UTC.
+    // The default DateTime parse of Dapper loses the UTC flag. A SQLite TEXT
+    // column has no timezone marker. This class maps the date column as a
+    // string. This class then parses the string as UTC. The write side
+    // stores the ISO-8601 format of a UTC value. The text is therefore UTC.
     private sealed class LinkRow
     {
         public string Code { get; set; } = null!;
@@ -38,7 +38,8 @@ public sealed class LinkRepository : ILinkRepository
             {
                 Code = link.Code,
                 OriginalUrl = link.OriginalUrl,
-                // ISO-8601 ("o") so the text sorts chronologically and parses losslessly.
+                // Use the ISO-8601 format "o". The text then sorts in time order
+                // and parses without loss.
                 CreatedAtUtc = link.CreatedAtUtc.ToString("o", CultureInfo.InvariantCulture),
             }, cancellationToken: cancellationToken);
             await connection.ExecuteAsync(command);
@@ -46,7 +47,8 @@ public sealed class LinkRepository : ILinkRepository
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19)
         {
-            // SQLITE_CONSTRAINT: code already taken — caller retries with a new code.
+            // SQLITE_CONSTRAINT: the code exists already. The caller then
+            // generates a new code.
             return false;
         }
     }

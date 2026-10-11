@@ -3,10 +3,12 @@ using Shortr.Persistence;
 
 namespace Shortr.UnitTests;
 
-// One disposable test database per test:
-// a unique temp file path, a real SqliteConnectionFactory pointed at it,
-// and deletion on dispose. No test touches the dev shortr.db or another
-// test's data. SQLite creates the file lazily at the first query.
+// This class gives one disposable SQLite database to each test.
+// The class holds a unique temp file path. The method CreateFactory builds
+// a real SqliteConnectionFactory that points to this path. The method
+// Dispose deletes the file. No test writes to the dev database shortr.db.
+// SQLite creates the file at the first query. The file does not exist
+// before that query.
 public sealed class TestDatabase : IDisposable
 {
     private readonly string _filePath;
@@ -16,8 +18,9 @@ public sealed class TestDatabase : IDisposable
         _filePath = Path.Combine(Path.GetTempPath(), $"shortr_test_{Guid.NewGuid():N}.db");
     }
 
-    // Builds the factory exactly as production builds it: from IConfiguration.
-    // In-memory config stands in for appsettings.json.
+    // This method builds the factory in the same way as production code.
+    // The method uses IConfiguration for this purpose. In-memory
+    // configuration takes the place of appsettings.json.
     public SqliteConnectionFactory CreateFactory()
     {
         var configuration = new ConfigurationBuilder()
@@ -32,7 +35,8 @@ public sealed class TestDatabase : IDisposable
 
     public void Dispose()
     {
-        // Best effort — cleanup must never fail a test.
-        try { File.Delete(_filePath); } catch { /* file may not exist or be locked */ }
+        // Delete the file. Do not throw on failure. Cleanup must not
+        // cause a test to fail. The file may not exist or may be locked.
+        try { File.Delete(_filePath); } catch { }
     }
 }

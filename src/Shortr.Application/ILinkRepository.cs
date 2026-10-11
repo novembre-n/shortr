@@ -2,12 +2,16 @@ using Shortr.Domain;
 
 namespace Shortr.Application;
 
-// Interface lives in Application so callers depend on the abstraction,
-// not on Dapper/SQLite. Implemented in Shortr.Persistence, wired in the API's DI.
+// This interface lives in Application. Callers depend on the interface.
+// Callers do not depend on Dapper or SQLite. The class LinkRepository
+// implements this interface. Program.cs wires the class into the DI container.
 public interface ILinkRepository
 {
-    // Returns false when the code already exists (unique constraint) instead of throwing.
+    // AddAsync returns false when the code exists already. The unique
+    // constraint causes this result. The method does not throw.
     public Task<bool> AddAsync(Link link, CancellationToken cancellationToken = default);
 
+    // GetByCodeAsync returns the link for the code. The method returns null
+    // when the code does not exist.
     public Task<Link?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
 }

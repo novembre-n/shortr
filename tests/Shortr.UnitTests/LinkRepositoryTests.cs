@@ -10,8 +10,8 @@ public sealed class LinkRepositoryTests : IDisposable
 
     public LinkRepositoryTests()
     {
-        // Each test starts from a real, initialized database — same state
-        // production has when a request arrives.
+        // Each test starts with a real database and an applied schema.
+        // This is the state of production when a request arrives.
         var factory = _database.CreateFactory();
         new DatabaseInitializer(factory).Initialize();
         _repository = new LinkRepository(factory);
@@ -41,8 +41,8 @@ public sealed class LinkRepositoryTests : IDisposable
         await _repository.AddAsync(link);
         var loaded = await _repository.GetByCodeAsync(link.Code);
 
-        // Every field must survive the DB round-trip — this is the test
-        // that would have caught the Dapper mapping bug.
+        // Each field must survive the round trip through the database.
+        // This test finds errors in the Dapper mapping.
         Assert.NotNull(loaded);
         Assert.Equal(link.Code, loaded!.Code);
         Assert.Equal(link.OriginalUrl, loaded.OriginalUrl);
@@ -54,8 +54,8 @@ public sealed class LinkRepositoryTests : IDisposable
     {
         await _repository.AddAsync(NewLink(code: "dup0001"));
 
-        // The unique constraint rejects the second insert — the collision
-        // contract the retry protocol is built on.
+        // The unique constraint rejects the second insert. The retry
+        // protocol depends on this result.
         var result = await _repository.AddAsync(NewLink(code: "dup0001", url: "https://other.com"));
 
         Assert.False(result);
@@ -67,7 +67,7 @@ public sealed class LinkRepositoryTests : IDisposable
         var original = NewLink(code: "keep0001", url: "https://original.com");
         await _repository.AddAsync(original);
 
-        // A rejected insert must leave the winning row untouched.
+        // A rejected insert must not change the row that exists already.
         await _repository.AddAsync(NewLink(code: "keep0001", url: "https://intruder.com"));
         var loaded = await _repository.GetByCodeAsync("keep0001");
 

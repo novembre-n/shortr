@@ -2,9 +2,11 @@ using Shortr.Domain;
 
 namespace Shortr.Application;
 
-// The business logic layer: validates input, generates codes, retries on
-// collision, persists. Everything above it (controller) maps outcomes to
-// HTTP; everything below it (repository) is faked in unit tests via ILinkRepository.
+// This class holds the business logic. The class validates the input,
+// generates the code, and retries after a collision. The class persists
+// the link through the repository. The controller maps the outcomes to
+// HTTP responses. Unit tests replace the repository with a fake. The
+// fake implements the interface ILinkRepository.
 public sealed class LinkService
 {
     public const int MaxCodeAttempts = 3;
@@ -45,10 +47,12 @@ public sealed class LinkService
                 return link;
             }
 
-            // Code taken — loop, next code.
+            // The code exists already. Continue the loop. Generate a new code.
         }
 
-        // 62^7 code space, 3 misses in a row: genuinely unexpected.
+        // The code space holds 62 to the power of 7 codes. Three collisions
+        // in a row do not occur in practice. This exception signals an
+        // unexpected condition.
         throw new InvalidOperationException(
             $"Could not generate a unique code after {MaxCodeAttempts} attempts.");
     }
@@ -58,8 +62,9 @@ public sealed class LinkService
         return await _repository.GetByCodeAsync(code, cancellationToken);
     }
 
-    // Validation lives here, not in the domain model — the model stays
-    // Dapper-friendly (public setters), the service enforces the rules.
+    // The validation lives in this class. The validation does not live in
+    // the domain model. The model keeps public setters for Dapper. This
+    // class enforces the rules for the input.
     private static void ValidateUrl(string originalUrl)
     {
         if (string.IsNullOrWhiteSpace(originalUrl)

@@ -8,8 +8,9 @@ public sealed class DatabaseInitializerTests : IDisposable
 
     private long CountSchemaObjects(string name)
     {
-        // sqlite_master holds the catalog: one row per table/index in the file.
-        // This is SQLite's own way of answering "does this object exist?".
+        // The table sqlite_master holds the catalog of the database file.
+        // One row exists per table and per index. Count the rows that match
+        // the name to answer the question "does this object exist?".
         var factory = _database.CreateFactory();
         using var connection = factory.Create();
         connection.Open();
