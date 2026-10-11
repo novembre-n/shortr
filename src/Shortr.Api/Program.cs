@@ -9,6 +9,9 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<SqliteConnectionFactory>();
 builder.Services.AddSingleton<DatabaseInitializer>();
 builder.Services.AddSingleton<ILinkRepository, LinkRepository>();
+builder.Services.AddSingleton<ShortCodeGenerator>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<LinkService>();
 
 var app = builder.Build();
 
