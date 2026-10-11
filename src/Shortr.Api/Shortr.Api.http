@@ -1,0 +1,6 @@
+@Shortr.Api_HostAddress = http://localhost:5213
+
+GET {{Shortr.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

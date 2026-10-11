@@ -1,0 +1,11 @@
+root = true
+
+[*.cs]
+# pick a severity per rule: error / warning / suggestion / silent / none
+dotnet_diagnostic.CA1848.severity = none      # turn off logging-analyzer noise
+dotnet_style_require_accessibility_modifiers = always:warning
+csharp_style_var_when_type_is_apparent = true:suggestion
+indent_style = space
+indent_size = 4
+charset = utf-8
+insert_final_newline = true

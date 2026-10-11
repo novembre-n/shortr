@@ -1,0 +1,27 @@
+using Shortr.Application;
+using Shortr.Persistence;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
+
+builder.Services.AddSingleton<SqliteConnectionFactory>();
+builder.Services.AddSingleton<DatabaseInitializer>();
+builder.Services.AddSingleton<ILinkRepository, LinkRepository>();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+// Schema must exist before the first request comes in.
+app.Services.GetRequiredService<DatabaseInitializer>().Initialize();
+
+app.Run();

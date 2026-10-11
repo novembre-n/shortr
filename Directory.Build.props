@@ -1,0 +1,21 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- enforce .editorconfig rules during build, not just in the IDE -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- the analyzer set: 'latest' = all rules for your SDK version;
+         'latest-recommended' = the meaningful subset, warnings off for noisy ones -->
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+
+    <!-- IDE hints (IDE0005 etc.) also become warnings -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- zero tolerance: warnings fail the build -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+     <!-- ... existing ... -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>
